@@ -36,19 +36,19 @@ def wrap_text_to_template(description, illustration, max_line_length=37):
     description_lines = split_text_into_lines(description, max_line_length)
 
     # Формируем шаблон
-    template = "    {id} => [\n".format(id="ID_PLACEHOLDER")
+    template_lines = ["    ID_PLACEHOLDER => ["]
     for line in description_lines:
         if line.strip() == "":
-            template += f'    "",\n'
+            template_lines.append(f'    "",')
         else:
-            template += f'    "{line}",\n'
+            template_lines.append(f'    "{line}",')
 
     # Добавляем пустую строку и строку иллюстрации
-    template += f'    "",\n'
-    template += f'    "Иллюстрация:{illustration}",\n'
-    template += "    ],"
+    template_lines.append(f'    "",')
+    template_lines.append(f'    "Иллюстрация:{illustration}",')
+    template_lines.append("    ],")
 
-    return template
+    return "\n".join(template_lines)
 
 # Пример использования
 description_text = (
