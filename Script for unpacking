@@ -1,0 +1,75 @@
+import re
+
+def process_data(input_str):
+    """
+    Обрабатывает входные данные и преобразует их в требуемый формат.
+    
+    Args:
+        input_str (str): Входная строка с данными.
+    
+    Returns:
+        str: Отформатированная строка в требуемом виде.
+    """
+    # Отфильтровываем пустые строки
+    lines = [line.strip() for line in input_str.split('\n') if line.strip()]
+    if not lines:
+        return "Неверный формат входных данных"
+
+    # Первая непустая строка должна содержать номер и заголовок
+    first_line = lines[0]
+    try:
+        number, rest = first_line.split('=>', 1)
+    except ValueError:
+        return "Неверный формат первой строки, ожидается наличие '=>'"
+    number = number.strip()
+    title = rest.strip()
+    
+    # Находим содержимое между первым "[[" и последней "]"
+    start = input_str.find("[[")
+    end = input_str.rfind("]")
+    if start == -1 or end == -1:
+        return "Неверный формат входных данных"
+    
+    lists_str = input_str[start+2:end].strip()
+    
+    # Разделяем содержимое на два списка с помощью регулярного выражения, которое учитывает пробелы и переносы строк
+    list_parts = re.split(r'\],\s*\[', lists_str)
+    if len(list_parts) != 2:
+        return "Неверный формат списков"
+    
+    list1_str, list2_str = list_parts
+    
+    # Извлекаем строки из первого списка (описательные предложения)
+    list1 = re.findall(r'"(.*?)"', list1_str)
+    description = ''.join(list1)  # Объединяем без пробелов
+    
+    # Извлекаем строки из второго списка (экипировка и навыки)
+    list2 = re.findall(r'"(.*?)"', list2_str)
+    
+    # Формируем выходную строку
+    output = f"{number} {title}\n{description}\n\n"
+    for item in list2:
+        output += item + '\n'
+    
+    return output
+
+# Пример использования
+input_data = """
+353 => # 究極至高人形
+      [[
+        "未知の技術で造り出された究極にして至高の人形",
+        "聖魔大戦において投入され、戦後に封印種として扱われた",
+        "究極の人形に相応しい様々なスキルを習得できる",
+        "また混沌の力の片鱗を有しており、混沌ダメージへの耐性を持つ",
+      ],
+      [
+        "装備防具：服A　胸当てC　甲羅C　ローブB　ドレスA",
+        "　　　　　薄着A　帽子A　高級帽A　兜C　軽盾B",
+        "　　　　　盾B",
+        "スキル：銃技　踊る　歌う　マキナ　御奉仕　魔技",
+        "　　　　造技",
+        "アビリティ：究極食いしばり　混沌属性軽減",
+      ]
+"""
+
+print(process_data(input_data))
